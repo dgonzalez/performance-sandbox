@@ -19,6 +19,9 @@
     "fastify-autoload": "^3.0.2",
     "fastify-cli": "^2.5.1",
     "fastify-plugin": "^3.0.0",
+    "fastq": "^1.9.0",
+    "http-errors": "^1.8.0",
+    "opossum": "^5.0.2",
     "under-pressure": "^5.4.0"
   },
   "devDependencies": {

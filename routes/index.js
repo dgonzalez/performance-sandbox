@@ -20,7 +20,7 @@ module.exports = async function (fastify, opts) {
   const fastQWorkers = 10;
 
   const queue = fastq(syncTimeout, fastQWorkers);
-  const pushAsync = util.promisify(queue.push);
+  const pushAsync = util.promisify(queue.push.bind(queue));
 
   const delayHandler = async function (request) {
     const { delay } = request.params;
@@ -39,4 +39,9 @@ module.exports = async function (fastify, opts) {
   fastify.get("/:delay", breaker.fire.bind(breaker));
 
   fastify.get("/under-pressure", async () => fastify.memoryUsage());
+  fastify.get("/fastq", async () => ({
+    concurrency: queue.concurrency,
+    idle: queue.idle(),
+    length: queue.length(),
+  }));
 };

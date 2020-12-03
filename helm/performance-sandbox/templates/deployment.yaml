@@ -13,11 +13,13 @@ spec:
     metadata:
       labels:
         app: performance-sandbox
+      annotations:
+        prometheus.io/scrape: 'true'
     spec:
       containers:
       - name: performance-sandbox
         imagePullPolicy: Never
-        image: dagonzadub/performance-sandbox:1.4
+        image: dagonzadub/performance-sandbox:1.5
         ports:
         - containerPort: 3000
           name: web

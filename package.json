@@ -18,6 +18,7 @@
     "fastify": "^3.0.0",
     "fastify-autoload": "^3.0.2",
     "fastify-cli": "^2.5.1",
+    "fastify-metrics": "^6.0.3",
     "fastify-plugin": "^3.0.0",
     "fastq": "^1.9.0",
     "http-errors": "^1.8.0",

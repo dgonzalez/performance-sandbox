@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: performance-sandbox-deployment
+  labels:
+    app: performance-sandbox
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: performance-sandbox
+  template:
+    metadata:
+      labels:
+        app: performance-sandbox
+      annotations:
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+      - name: performance-sandbox
+        imagePullPolicy: Never
+        image: dagonzadub/performance-sandbox:1.5
+        ports:
+        - containerPort: 3000
+          name: web
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: web
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: web
+          initialDelaySeconds: 3
+          periodSeconds: 3

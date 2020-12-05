@@ -61,12 +61,19 @@ While autocannon runs (you can increase the duration of the run using the `-d` o
 
 - Docker
 - Kubernetes (Docker Desktop's K8s works fine too)
-- Helm (for Helm setup instructions see [here](./helm/performance-sandbox/README.md))
+- Follow Helm and Prometheus [setup instructions](./helm/performance-sandbox/README.md)
 
 ### Setup
 
 - `docker build -t performance-sandbox .` - to create and tag the Docker image
 - `helm install performance-sandbox helm/performance-sandbox` - to install the Helm chart
-- `kubectl get services` - to see the port on which the `performance-sandbox` service is running
-- `kubectl get pods -w` - in a new terminal to see the status of pods
+- `kubectl get service performance-sandbox` - to see the port on which the `performance-sandbox` service is running
+
+### Testing
+
+- `kubectl get deployment performance-sandbox-deployment -w` - in a new terminal to see ready the status of pods
 - `autocannon http://localhost:{PORT}/expensive-op -c {value}` - hit the service with autocannon and increase the `-c` value to see that pods readiness changes due to the readiness probe returning an error when the load becomes too high
+
+### TODO
+
+Autoscaling based on custom metrics

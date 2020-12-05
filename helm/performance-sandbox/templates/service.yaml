@@ -5,8 +5,8 @@ metadata:
   labels:
     app: performance-sandbox
   annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/port: 80
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
 spec:
   type: NodePort
   selector:

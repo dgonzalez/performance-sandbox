@@ -1,40 +1,59 @@
-"use strict";
+'use strict'
 
-const path = require("path");
-const AutoLoad = require("fastify-autoload");
+const path = require('path')
+const util = require('util')
+const { ServiceUnavailable, TooManyRequests } = require('http-errors')
+const fastq = require('fastq')
+
+const expensiveOp = (t, cb) => setTimeout(cb, t)
+const CONCURRENCY = +process.env.CONCURRENCY || 1
 
 module.exports = async function (fastify, opts) {
-  // TODO Hold into this for a moment:
-  // await fastify.register(require("under-pressure"), {
-  //   exposeStatusRoute: true,
-  // });
+  const expensiveOpQueue = fastq(expensiveOp, CONCURRENCY)
 
-  let requestCount = 0
+  const pushToQueueAsync = util.promisify(
+    expensiveOpQueue.push.bind(expensiveOpQueue)
+  )
 
-  fastify.get("/liveness", async () => {
-    console.log("liveness called")
-    return "OK"
+  function shouldAllowRequest() {
+    return expensiveOpQueue.length() < CONCURRENCY * 4
+  }
+
+  function isReady() {
+    return expensiveOpQueue.length() <= CONCURRENCY * 2
+  }
+
+  fastify.get('/expensive-op', {
+    async onRequest() {
+      // 🔥 HOTSPOT: circuit breaker
+      if (!shouldAllowRequest()) {
+        throw new ServiceUnavailable()
+      }
+    },
+    handler: async function () {
+      const now = Date.now()
+
+      await pushToQueueAsync(2000)
+
+      return { durationMs: Date.now() - now }
+    },
   })
 
-  fastify.get("/requestCounter", async () => {
-    console.log("request counter called")
-    requestCount++
-    setTimeout(() => {requestCount = 0}, 30000)
-    return `requestCount = ${requestCount}`
+  fastify.get('/liveness', async () => {
+    // 🔥 HOTSPOT: liveness always returns ok unless
+    // there are unrecoverable errors
+    return 'OK'
   })
 
-  fastify.get("/readiness", async () => {
-    console.log("readiness called")
-    if (requestCount > 5) {
-      throw new Error("kaboom!")
+  fastify.get('/readiness', async () => {
+    if (isReady()) {
+      return 'OK'
     }
-    return "OK"
+
+    throw new TooManyRequests('Unable to accept new requests')
   })
 
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, "routes"),
-    options: Object.assign({}, opts),
-  });
-
-  fastify.register(require("fastify-metrics"), {endpoint: "/metrics"})
-};
+  fastify.register(require('fastify-metrics'), {
+    endpoint: '/metrics',
+  })
+}

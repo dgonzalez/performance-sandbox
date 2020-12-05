@@ -1,11 +1,10 @@
-FROM node:15.3.0-alpine3.10
+FROM node:alpine
 
-COPY app.js /app/app.js
-COPY package.json /app/package.json
-COPY package-lock.json /app/package-lock.json
-COPY routes/ /app/routes/
+COPY app.js package.json package-lock.json app/
 
 WORKDIR /app
 RUN npm install
+
+ENV FASTIFY_ADDRESS=0.0.0.0 
 
 CMD ["npm", "start"]

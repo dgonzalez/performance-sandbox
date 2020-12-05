@@ -13,25 +13,26 @@ spec:
     metadata:
       labels:
         app: performance-sandbox
+        date: '{{ now | unixEpoch }}'
       annotations:
         prometheus.io/scrape: 'true'
     spec:
       containers:
-      - name: performance-sandbox
-        imagePullPolicy: Never
-        image: dagonzadub/performance-sandbox:1.5
-        ports:
-        - containerPort: 3000
-          name: web
-        livenessProbe:
-          httpGet:
-            path: /liveness
-            port: web
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: web
-          initialDelaySeconds: 3
-          periodSeconds: 3
+        - name: performance-sandbox
+          imagePullPolicy: Never
+          image: performance-sandbox
+          ports:
+            - containerPort: 3000
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: web
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: web
+            initialDelaySeconds: 3
+            periodSeconds: 3

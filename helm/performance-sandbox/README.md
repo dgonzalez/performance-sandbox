@@ -1,18 +1,25 @@
 # Installing
-Add Helm repositories:
+
+### Install Helm
+
+https://helm.sh/docs/intro/install/
+
+### Add Helm repositories
 
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add stable https://charts.helm.sh/stable
-helm repo update
+  helm repo update
 ```
 
-Install Prometheus:
+### Install Prometheus
+
 ```
 helm install prometheus prometheus-community/prometheus
 ```
 
-Install the Prometheus Adapter for custom metrics:
+### Install the Prometheus Adapter for custom metrics:
+
 ```
 helm install prometheus-adapter prometheus-community/prometheus-adapter
 ```

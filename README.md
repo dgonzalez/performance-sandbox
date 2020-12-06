@@ -69,6 +69,19 @@ While autocannon runs (you can increase the duration of the run using the `-d` o
 - `helm install performance-sandbox helm/performance-sandbox` - to install the Helm chart
 - `kubectl get service performance-sandbox` - to see the port on which the `performance-sandbox` service is running
 
+If you change anything in the application, you'll have to recreate the image and upgrade your installation with:
+
+- `helm upgrade performance-sandbox helm/performance-sandbox`
+
+#### Note
+
+If you are running a version of K8s that doesn't share the Docker registry you may have to save and then import the Docker image into K8s.
+
+For instance in `microk8s`:
+
+- `docker save performance-sandbox > performance-sandbox.tar`
+- `microk8s ctr image import performance-sandbox.tar`
+
 ### Testing
 
 - `kubectl get deployment performance-sandbox-deployment -w` - in a new terminal to see ready the status of pods

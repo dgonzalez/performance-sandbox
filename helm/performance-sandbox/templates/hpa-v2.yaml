@@ -1,0 +1,78 @@
+apiVersion: v1
+items:
+  - apiVersion: autoscaling/v2beta2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      creationTimestamp: '2020-12-05T23:09:31Z'
+      managedFields:
+        - apiVersion: autoscaling/v1
+          fieldsType: FieldsV1
+          fieldsV1:
+            f:spec:
+              f:maxReplicas: {}
+              f:minReplicas: {}
+              f:scaleTargetRef:
+                f:apiVersion: {}
+                f:kind: {}
+                f:name: {}
+              f:targetCPUUtilizationPercentage: {}
+          manager: kubectl-autoscale
+          operation: Update
+          time: '2020-12-05T23:09:31Z'
+        - apiVersion: autoscaling/v1
+          fieldsType: FieldsV1
+          fieldsV1:
+            f:metadata:
+              f:annotations:
+                .: {}
+                f:autoscaling.alpha.kubernetes.io/conditions: {}
+            f:status:
+              f:currentReplicas: {}
+          manager: kube-controller-manager
+          operation: Update
+          time: '2020-12-06T13:29:39Z'
+      name: performance-sandbox-deployment
+      namespace: default
+      resourceVersion: '105972'
+      selfLink: /apis/autoscaling/v2beta2/namespaces/default/horizontalpodautoscalers/performance-sandbox-deployment
+      uid: bba30618-0736-4b6e-a50f-ade4a9fbd1fb
+    spec:
+      maxReplicas: 10
+      minReplicas: 3
+      metrics:
+        - type: Object
+          object:
+            describedObject:
+              apiVersion: /v1
+              kind: Namespace
+              name: default
+            metric:
+              name: queue_ratio
+            target:
+              type: AverageValue
+              averageValue: 3
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: performance-sandbox-deployment
+    status:
+      conditions:
+        - lastTransitionTime: '2020-12-05T23:09:46Z'
+          message: the HPA controller was able to get the target's current scale
+          reason: SucceededGetScale
+          status: 'True'
+          type: AbleToScale
+        - lastTransitionTime: '2020-12-05T23:09:46Z'
+          message:
+            'the HPA was unable to compute the replica count: missing request for
+            cpu'
+          reason: FailedGetResourceMetric
+          status: 'False'
+          type: ScalingActive
+      currentMetrics: null
+      currentReplicas: 1
+      desiredReplicas: 0
+kind: List
+metadata:
+  resourceVersion: ''
+  selfLink: ''

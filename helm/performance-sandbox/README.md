@@ -21,5 +21,5 @@ helm install prometheus prometheus-community/prometheus
 ### Install the Prometheus Adapter for custom metrics:
 
 ```
-helm install prometheus-adapter prometheus-community/prometheus-adapter
+helm install prometheus-adapter prometheus-community/prometheus-adapter -f ./helm/performance-sandbox-values.yaml
 ```

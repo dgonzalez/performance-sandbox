@@ -1,0 +1,13 @@
+rules:
+  custom:
+    - seriesQuery: '{__name__=~"^queue_ratio$"}'
+      resources:
+        overrides:
+          kubernetes_pod_name:
+            resource: pod
+          kubernetes_namespace:
+            resource: namespace
+      name:
+        matches: ''
+        as: 'queue_ratio'
+      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)

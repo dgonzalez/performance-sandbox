@@ -13,5 +13,5 @@ spec:
   metrics:
     - type: Pods
       pods:
-        metricName: "queue_ratio_usage"
+        metricName: "kube_pod_container_status_ready"
         targetAverageValue: 2

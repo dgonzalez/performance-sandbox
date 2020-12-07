@@ -1,21 +1,17 @@
 prometheus-adapter:
   dnsPolicy: ClusterFirstWithHostNet
+  logLevel: 10
   prometheus:
     url: 'http://performance-sandbox-prometheus-server'
     port: 80
   rules:
     default: false
     custom:
-      - seriesQuery: '{__name__=~"^queue_ratio$"}'
+      - seriesQuery: 'kube_pod_container_status_ready{container = "performance-sandbox", pod =~"performance-sandbox-deployment.*", namespace != ""}'
         resources:
           overrides:
-            kubernetes_pod_name:
-              resource: pod
-            kubernetes_namespace:
-              resource: namespace
-        name:
-          matches: ''
-          as: 'queue_ratio'
+            pod: {resource: "pod"}
+            namespace: {resource: "namespace"}
         metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)
 metrics-server:
   args:

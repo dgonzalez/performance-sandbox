@@ -12,7 +12,7 @@ prometheus-adapter:
           overrides:
             pod: {resource: "pod"}
             namespace: {resource: "namespace"}
-        metricsQuery: sum({container = "performance-sandbox", pod =~"performance-sandbox-deployment.*", namespace != ""}) by (<<.GroupBy>>)
+        metricsQuery: sum(kube_pod_container_status_ready{container = "performance-sandbox", pod =~"performance-sandbox-deployment.*", namespace != ""}) by (pod)
 metrics-server:
   args:
     - --kubelet-insecure-tls

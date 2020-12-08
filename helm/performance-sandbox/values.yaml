@@ -1,0 +1,19 @@
+prometheus-adapter:
+  dnsPolicy: ClusterFirstWithHostNet
+  logLevel: 10
+  prometheus:
+    url: 'http://performance-sandbox-prometheus-server'
+    port: 80
+  rules:
+    default: false
+    custom:
+      - seriesQuery: 'queue_ratio'
+        resources:
+          overrides:
+            kubernetes_pod_name: {resource: "pod"}
+            kubernetes_namespace: {resource: "namespace"}
+        metricsQuery: sum(queue_ratio{kubernetes_pod_name =~"performance-sandbox-deployment.*"}) by (kubernetes_pod_name)
+metrics-server:
+  args:
+    - --kubelet-insecure-tls
+    - --kubelet-preferred-address-types=InternalIP

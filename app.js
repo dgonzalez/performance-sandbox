@@ -1,7 +1,18 @@
 "use strict";
 
+<<<<<<< Updated upstream
 const path = require("path");
 const AutoLoad = require("fastify-autoload");
+=======
+const path = require('path')
+const util = require('util')
+const { ServiceUnavailable, TooManyRequests } = require('http-errors')
+const fastq = require('fastq')
+const { get } = require('http')
+
+const expensiveOp = (t, cb) => setTimeout(cb, t)
+const CONCURRENCY = +process.env.CONCURRENCY || 1
+>>>>>>> Stashed changes
 
 module.exports = async function (fastify, opts) {
   // TODO Hold into this for a moment:
@@ -11,16 +22,50 @@ module.exports = async function (fastify, opts) {
 
   let requestCount = 0
 
-  fastify.get("/liveness", async () => {
-    console.log("liveness called")
-    return "OK"
+  const queueRatioGauge = new fastify.metrics.client.Gauge({
+    name: 'queue_ratio',
+    help: 'ratio between queue length and queue concurrency',
+    collect() {
+      
+      this.set(getQueueRatio())
+    },
   })
 
-  fastify.get("/requestCounter", async () => {
-    console.log("request counter called")
-    requestCount++
-    setTimeout(() => {requestCount = 0}, 30000)
-    return `requestCount = ${requestCount}`
+  const pushToQueueAsync = util.promisify(
+    expensiveOpQueue.push.bind(expensiveOpQueue)
+  )
+
+  function getQueueRatio() {
+    return expensiveOpQueue.length() / CONCURRENCY
+  }
+
+  function shouldAllowRequest() {
+    const queueRatio = getQueueRatio()
+    console.log(`setting queue gauge to ${getQueueRatio()}`)
+    queueRatioGauge.set(queueRatio)
+    return queueRatio < 4
+  }
+
+  function isReady() {
+    return getQueueRatio() <= 2
+  }
+
+  fastify.get('/expensive-op', {
+    async onRequest() {
+      console.log('expensive endpoint called but circuit breaker is open')
+      // 🔥 HOTSPOT: circuit breaker
+      if (!shouldAllowRequest()) {
+        throw new ServiceUnavailable()
+      }
+    },
+    handler: async function () {
+      console.log('expensive endpoint called')
+      const now = Date.now()
+
+      await pushToQueueAsync(2000)
+
+      return { durationMs: Date.now() - now }
+    },
   })
 
   fastify.get("/readiness", async () => {

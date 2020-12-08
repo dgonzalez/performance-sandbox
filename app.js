@@ -9,18 +9,38 @@ const expensiveOp = (t, cb) => setTimeout(cb, t)
 const CONCURRENCY = +process.env.CONCURRENCY || 1
 
 module.exports = async function (fastify, opts) {
+  await fastify.register(require('fastify-metrics'), {
+    enableRouteMetrics: false,
+    enableDefaultMetrics: false,
+    endpoint: '/metrics',
+  })
+
   const expensiveOpQueue = fastq(expensiveOp, CONCURRENCY)
+
+  const queueRatioGauge = new fastify.metrics.client.Gauge({
+    name: 'queue_ratio',
+    help: 'ratio between queue length and queue concurrency',
+    collect() {
+      this.set(getQueueRatio())
+    },
+  })
 
   const pushToQueueAsync = util.promisify(
     expensiveOpQueue.push.bind(expensiveOpQueue)
   )
 
+  function getQueueRatio() {
+    return expensiveOpQueue.length() / CONCURRENCY
+  }
+
   function shouldAllowRequest() {
-    return expensiveOpQueue.length() < CONCURRENCY * 4
+    const queueRatio = getQueueRatio()
+    queueRatioGauge.set(queueRatio)
+    return queueRatio < 4
   }
 
   function isReady() {
-    return expensiveOpQueue.length() <= CONCURRENCY * 2
+    return getQueueRatio() <= 2
   }
 
   fastify.get('/expensive-op', {
@@ -51,9 +71,5 @@ module.exports = async function (fastify, opts) {
     }
 
     throw new TooManyRequests('Unable to accept new requests')
-  })
-
-  fastify.register(require('fastify-metrics'), {
-    endpoint: '/metrics',
   })
 }

@@ -6,6 +6,6 @@ WORKDIR /app
 RUN npm install
 
 ENV FASTIFY_ADDRESS=0.0.0.0
-ENV CONCURRENCY=10
+ENV CONCURRENCY=3
 
 CMD ["npm", "start"]

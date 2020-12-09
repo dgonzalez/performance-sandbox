@@ -1,18 +1,12 @@
 # Installing
-Add Helm repositories:
 
-```
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add stable https://charts.helm.sh/stable
-helm repo update
-```
+### Install Helm
 
-Install Prometheus:
-```
-helm install prometheus prometheus-community/prometheus
-```
+https://helm.sh/docs/intro/install/
 
-Install the Prometheus Adapter for custom metrics:
+### Install the Chart
+
+In order to install the Chart and all its dependencies just execute (from the folder where the `Chart.yaml` is located):
 ```
-helm install prometheus-adapter prometheus-community/prometheus-adapter
+helm install performance-sandbox ./
 ```

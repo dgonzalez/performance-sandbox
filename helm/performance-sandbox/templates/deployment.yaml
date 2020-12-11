@@ -5,7 +5,7 @@ metadata:
   labels:
     app: performance-sandbox
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: performance-sandbox

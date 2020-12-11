@@ -87,6 +87,14 @@ For instance in `microk8s`:
 - `kubectl get deployment performance-sandbox-deployment -w` - in a new terminal to see ready the status of pods
 - `autocannon http://localhost:{PORT}/expensive-op -c {value}` - hit the service with autocannon and increase the `-c` value to see that pods readiness changes due to the readiness probe returning an error when the load becomes too high
 
-### TODO
+### Troubleshooting in K8s
+You should be able to see the metrics posted from Prometheus into the custom metrics API by executing the following command:
+```
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/queue_ratio" | jq .
+```
 
-Autoscaling based on custom metrics
+If they are not present a couple of minutes after the helm chart being deployed, it is possible that the adapter is having some problems. In order to troubleshoot
+execute (change the pod name):
+```
+kubectl logs performance-sandbox-prometheus-adapter-6cbf7799b6-dd82l
+```
